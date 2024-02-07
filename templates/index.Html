@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Materias Primas</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Consulta de Materias Primas</h1>
+        <div class="search-container">
+            <form method="post" action="/buscar" id="consultaForm">
+                {% csrf_token %}
+                <input type="text" id="codigoInput" name="codigo" placeholder="Ingrese el código">
+                <button type="button" onclick="buscar()">Buscar</button>
+            </form>
+        </div>
+        <div id="pdfViewer">
+            <!-- Aquí se mostrará el PDF -->
+        </div>
+        <div id="mensajeError" style="display: none;">
+            <p id="errorTexto"></p>
+            <button onclick="enviarCorreo()">Enviar Correo</button>
+        </div>
+    </div>
+    <!-- Bloque de scripts JavaScript en index.html -->
+    <script>
+        function cargarImagenes(datosImagenes) {
+            var container = document.getElementById("pdfViewer");
+            container.innerHTML = '';
+            for (var i = 0; i < datosImagenes.length; i++) {
+                try {
+                    var imgElement = document.createElement('img');
+                    imgElement.src = 'data:image/png;base64,' + datosImagenes[i];
+                    container.appendChild(imgElement);
+                } catch (error) {
+                    console.error('Error al cargar la imagen:', error);
+                }
+            }
+        }
+    
+        function buscar() {
+            var codigo = document.getElementById("codigoInput").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/buscar", true);
+    
+            // Agrega el token CSRF al encabezado de la solicitud
+            var csrftoken = getCookie('csrftoken');
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var respuesta = JSON.parse(xhr.responseText);
+                    if (respuesta.images) {
+                        // Mostrar las imágenes
+                        cargarImagenes(respuesta.images);
+                    } else {
+                        // Mostrar mensaje de error
+                        document.getElementById("mensajeError").style.display = "block";
+                        document.getElementById("errorTexto").innerText = respuesta.error;
+    
+                        // Llamada para enviar el correo de aviso
+                        enviarCorreo();
+                    }
+                }
+            };
+            xhr.send("codigo=" + codigo);
+        }
+    
+        function enviarCorreo() {
+            // Enviar una solicitud al servidor para manejar el envío del correo electrónico
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/enviar_correo", true);
+    
+            // Agrega el token CSRF al encabezado de la solicitud
+            var csrftoken = getCookie('csrftoken');
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    alert("Correo electrónico enviado");
+                }
+            };
+            xhr.send();
+        }
+    
+        // Función para obtener el valor del token CSRF de las cookies
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+
+</html>
+
