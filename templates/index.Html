@@ -19,9 +19,6 @@
                 <button type="button" onclick="buscar()">Buscar</button>
             </form>
         </div>
-        <div id="pdfViewer">
-            <!-- Aquí se mostrará el PDF -->
-        </div>
         <div id="mensajeError" style="display: none;">
             <p id="errorTexto"></p>
             <button onclick="enviarCorreo()">Enviar Correo</button>
@@ -29,66 +26,39 @@
     </div>
     <!-- Bloque de scripts JavaScript en index.html -->
     <script>
-        function cargarImagenes(datosImagenes) {
-            var container = document.getElementById("pdfViewer");
-            container.innerHTML = '';
-            for (var i = 0; i < datosImagenes.length; i++) {
-                try {
-                    var imgElement = document.createElement('img');
-                    imgElement.src = 'data:image/png;base64,' + datosImagenes[i];
-                    container.appendChild(imgElement);
-                } catch (error) {
-                    console.error('Error al cargar la imagen:', error);
-                }
-            }
-        }
-    
         function buscar() {
             var codigo = document.getElementById("codigoInput").value;
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/buscar", true);
-    
+        
             // Agrega el token CSRF al encabezado de la solicitud
             var csrftoken = getCookie('csrftoken');
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    
+        
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var respuesta = JSON.parse(xhr.responseText);
-                    if (respuesta.images) {
-                        // Mostrar las imágenes
-                        cargarImagenes(respuesta.images);
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        // Si la solicitud es exitosa, abrir el PDF en una nueva pestaña
+                        abrirPDF(xhr.response);
                     } else {
                         // Mostrar mensaje de error
                         document.getElementById("mensajeError").style.display = "block";
-                        document.getElementById("errorTexto").innerText = respuesta.error;
-    
-                        // Llamada para enviar el correo de aviso
-                        enviarCorreo();
+                        document.getElementById("errorTexto").innerText = "Error: No se pudo encontrar el PDF.";
                     }
                 }
             };
+            xhr.responseType = 'blob'; // Indicar que la respuesta es un archivo
             xhr.send("codigo=" + codigo);
         }
-    
-        function enviarCorreo() {
-            // Enviar una solicitud al servidor para manejar el envío del correo electrónico
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/enviar_correo", true);
-    
-            // Agrega el token CSRF al encabezado de la solicitud
-            var csrftoken = getCookie('csrftoken');
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    alert("Correo electrónico enviado");
-                }
-            };
-            xhr.send();
+
+        function abrirPDF(pdfBlob, nombreArchivo) {
+            var url = URL.createObjectURL(pdfBlob);
+        
+            // Abrir el PDF en una nueva pestaña del navegador
+            window.open(url, '_blank');
         }
-    
+
         // Función para obtener el valor del token CSRF de las cookies
         function getCookie(name) {
             var cookieValue = null;
@@ -104,8 +74,24 @@
             }
             return cookieValue;
         }
+
+        document.getElementById("consultaForm").addEventListener("keypress", function(event) {
+            // Verificar si la tecla presionada es "Enter"
+            if (event.key === "Enter") {
+                // Prevenir la acción predeterminada del formulario (recargar la página)
+                event.preventDefault();
+                // Llamar a la función buscar()
+                buscar();
+            }
+        });
+        
     </script>
 </body>
 
 </html>
+
+
+
+
+
 
