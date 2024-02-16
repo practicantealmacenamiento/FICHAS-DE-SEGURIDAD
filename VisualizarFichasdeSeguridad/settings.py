@@ -88,3 +88,15 @@ STATIC_URL = "/static/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Configuración para el envío de correos electrónicos
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.office365.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # O False si no se utiliza TLS
+EMAIL_HOST_USER = "practicante.almacenamiento@prebel.com.co"
+EMAIL_HOST_PASSWORD = "Prebel2024+*"
+
+# Configuración adicional para el envío de correos electrónicos en modo de depuración
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

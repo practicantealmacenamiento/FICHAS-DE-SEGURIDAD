@@ -1,10 +1,10 @@
-from django.shortcuts import render
-from django.http import JsonResponse
 import os
 import base64
-from django.http import HttpResponse
 import mimetypes
+from django.http import HttpResponse
+from django.core.mail import send_mail
 from django.shortcuts import render
+from django.http import JsonResponse
 
 
 def index(request):
@@ -13,7 +13,7 @@ def index(request):
 
 def buscar_pdf_en_onedrive_local(codigo):
     # Ruta completa al directorio local de OneDrive en tu sistema
-    onedrive_local_path = r"C:\FDS\FICHAS DE DATOS DE SEGURIDAD"
+    onedrive_local_path = r"C:\Users\prac.almacenamiento\OneDrive - Prebel S.A\FDS\FICHAS DE DATOS DE SEGURIDAD"
 
     # Construye la ruta completa al PDF
     pdf_local_path = os.path.join(onedrive_local_path, f"{codigo}.pdf")

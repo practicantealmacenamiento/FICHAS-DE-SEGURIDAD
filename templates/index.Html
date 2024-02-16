@@ -84,6 +84,26 @@
                 buscar();
             }
         });
+
+        function enviarCorreo() {
+            var codigo = document.getElementById("codigoInput").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/enviar_correo_django?codigo=" + codigo, true);
+        
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        // Correo enviado correctamente
+                        alert("Correo enviado correctamente.");
+                    } else {
+                        // Error al enviar el correo
+                        alert("Error al enviar el correo.");
+                    }
+                }
+            };
+        
+            xhr.send();
+        }
         
     </script>
 </body>
