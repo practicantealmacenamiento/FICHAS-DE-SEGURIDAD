@@ -19,6 +19,15 @@
                 <button type="button" onclick="buscar()">Buscar</button>
             </form>
         </div>
+        <div id="pdfViewer" class="pdf-viewer">
+            <h2>Archivos PDF Disponibles</h2>
+            <div class="pdf-list">
+                <ul id="pdfNames" class="pdf-names">
+                    <!-- Aquí se mostrarán los nombres de los archivos PDF -->
+                </ul>
+            </div>
+        </div>
+        
         <div id="mensajeError" style="display: none;">
             <p id="errorTexto"></p>
             <button onclick="enviarCorreo()">Enviar Correo</button>
@@ -26,6 +35,34 @@
     </div>
     <!-- Bloque de scripts JavaScript en index.html -->
     <script>
+        window.onload = function() {
+            obtenerNombresPDF();
+        };
+
+        function obtenerNombresPDF() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/obtener_nombres_pdf", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    var nombresPDF = response.nombres_pdf;
+                    var pdfNamesList = document.getElementById("pdfNames");
+                    pdfNamesList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos nombres
+                    nombresPDF.forEach(function(nombre) {
+                        var listItem = document.createElement("li");
+                        listItem.textContent = nombre;
+                        // Agregar evento clic para copiar el nombre del PDF al campo de búsqueda
+                        listItem.addEventListener("click", function() {
+                            var codigoInput = document.getElementById("codigoInput");
+                            codigoInput.value = nombre.substring(0, nombre.lastIndexOf(".pdf"));
+                        });
+                        pdfNamesList.appendChild(listItem);
+                    });
+                }
+            };
+            xhr.send();
+        }
+
         function buscar() {
             var codigo = document.getElementById("codigoInput").value;
             var xhr = new XMLHttpRequest();
@@ -104,11 +141,15 @@
         
             xhr.send();
         }
-        
     </script>
 </body>
 
 </html>
+
+
+
+
+
 
 
 

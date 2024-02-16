@@ -3,9 +3,9 @@ from django.conf import settings
 from django.http import HttpResponse
 
 
-def enviar_correo_django(request):
+def enviar_correo_django(request, codigo):
     try:
-        codigo = request.GET.get("codigo")
+        # codigo = request.GET.get("codigo")
         subject = f"Solicitud de PDF - Código {codigo}"
         message = f"Estimado usuario,\n\nEl código {codigo} no se encuentra en el sistema. Por favor, revise la solicitud."
         from_email = settings.EMAIL_HOST_USER

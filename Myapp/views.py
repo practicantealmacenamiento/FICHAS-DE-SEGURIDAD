@@ -1,6 +1,7 @@
 import os
 import base64
 import mimetypes
+import json
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.shortcuts import render
@@ -9,6 +10,18 @@ from django.http import JsonResponse
 
 def index(request):
     return render(request, "index.html")
+
+
+def obtener_nombres_pdf(request):
+    directorio_pdf = r"C:\Users\prac.almacenamiento\OneDrive - Prebel S.A\FDS\FICHAS DE DATOS DE SEGURIDAD"
+    nombres_pdf = []
+
+    # Obtener todos los nombres de archivos PDF en el directorio
+    for filename in os.listdir(directorio_pdf):
+        if filename.endswith(".pdf"):
+            nombres_pdf.append(filename)
+
+    return JsonResponse({"nombres_pdf": nombres_pdf})
 
 
 def buscar_pdf_en_onedrive_local(codigo):

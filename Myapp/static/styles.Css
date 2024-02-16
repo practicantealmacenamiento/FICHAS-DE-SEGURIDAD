@@ -1,3 +1,5 @@
+/* styles.css */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -52,4 +54,31 @@ button {
     background-color: #ff0000;
     color: #fff;
     border: none;
+}
+
+.pdf-viewer {
+    margin-top: 20px;
+}
+
+.pdf-list {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.pdf-names {
+    list-style: none;
+    padding: 0;
+}
+
+.pdf-names li {
+    margin-bottom: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.pdf-names li:hover {
+    background-color: #f0f0f0;
 }
