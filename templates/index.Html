@@ -7,9 +7,13 @@
     <title>Consulta de Materias Primas</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 </head>
 
 <body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <div class="container">
         <h1>Consulta de Materias Primas</h1>
         <div class="search-container">
@@ -30,7 +34,7 @@
         
         <div id="mensajeError" style="display: none;">
             <p id="errorTexto"></p>
-            <button onclick="enviarCorreo()">Enviar Correo</button>
+            <button onclick="enviar_correo_django()">Enviar Correo</button>
         </div>
     </div>
     <!-- Bloque de scripts JavaScript en index.html -->
@@ -42,19 +46,22 @@
         function obtenerNombresPDF() {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "/obtener_nombres_pdf", true);
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
                     var nombresPDF = response.nombres_pdf;
                     var pdfNamesList = document.getElementById("pdfNames");
                     pdfNamesList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos nombres
-                    nombresPDF.forEach(function(nombre) {
+                    nombresPDF.forEach(function (nombre) {
                         var listItem = document.createElement("li");
                         listItem.textContent = nombre;
                         // Agregar evento clic para copiar el nombre del PDF al campo de búsqueda
                         listItem.addEventListener("click", function() {
                             var codigoInput = document.getElementById("codigoInput");
-                            codigoInput.value = nombre.substring(0, nombre.lastIndexOf(".pdf"));
+                            // Reemplazar cualquier texto existente en la barra de búsqueda
+                            codigoInput.value = nombre.replace(".pdf", "");
+                            // Al seleccionar un PDF, también limpiamos los resultados de búsqueda similares
+                            buscarPDFsSimilares("");
                         });
                         pdfNamesList.appendChild(listItem);
                     });
@@ -62,6 +69,28 @@
             };
             xhr.send();
         }
+
+        // Función para manipular el valor en la barra de búsqueda
+        function manipularCodigo() {
+            var codigoInput = document.getElementById("codigoInput");
+            var codigo = codigoInput.value;
+            
+            // Buscar la posición del primer $2 en el código
+            var indiceInicio = codigo.indexOf("$2") + 2;
+            var indiceFin = codigo.indexOf("$3");
+            
+            // Verificar si se encontraron los delimitadores $2 y $3
+            if (indiceInicio !== -1 && indiceFin !== -1) {
+                // Extraer el código entre $2 y $3
+                var codigoNuevo = codigo.substring(indiceInicio, indiceFin);
+                // Actualizar el valor en la barra de búsqueda
+                codigoInput.value = codigoNuevo;
+            }
+        }
+
+        // Asociar la función manipularCodigo al evento input en la barra de búsqueda
+        var codigoInput = document.getElementById("codigoInput");
+        codigoInput.addEventListener("input", manipularCodigo);
 
         function buscar() {
             var codigo = document.getElementById("codigoInput").value;
@@ -87,6 +116,7 @@
             };
             xhr.responseType = 'blob'; // Indicar que la respuesta es un archivo
             xhr.send("codigo=" + codigo);
+            
         }
 
         function abrirPDF(pdfBlob, nombreArchivo) {
@@ -94,6 +124,12 @@
         
             // Abrir el PDF en una nueva pestaña del navegador
             window.open(url, '_blank');
+
+                // Refrescar la página después de 1 segundo (1000 milisegundos)
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            
         }
 
         // Función para obtener el valor del token CSRF de las cookies
@@ -122,14 +158,43 @@
             }
         });
 
-        function enviarCorreo() {
+
+        // Función para llamar a la vista buscar_pdf_similares y actualizar los resultados
+        function buscarPDFsSimilares(codigo) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/buscar_pdf_similares", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            // Agregar el token CSRF al encabezado de la solicitud
+            var csrftoken = getCookie('csrftoken');
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    var pdfNamesList = document.getElementById("pdfNames");
+                    pdfNamesList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos nombres
+                    response.nombres_pdf.forEach(function (nombre) {
+                        var listItem = document.createElement("li");
+                        listItem.textContent = nombre;
+                        listItem.addEventListener("click", function() {
+                            var codigoInput = document.getElementById("codigoInput");
+                            codigoInput.value = nombre.replace(".pdf", "");
+                            buscar(); // Llamar a la función buscar después de escribir el nombre en la barra de búsqueda
+                        });
+                        pdfNamesList.appendChild(listItem);
+                    });
+                }
+            };
+            xhr.send("codigo=" + codigo);
+        }
+        
+        function enviar_correo_django() {
             var codigo = document.getElementById("codigoInput").value;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/enviar_correo_django?codigo=" + codigo, true);
+            xhr.open("GET", "/enviar_correo_django/" + codigo + "/", true);
         
             xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200) {
+                if (xhr.readyState ==  4) {
+                    if (xhr.status ==  200) {
                         // Correo enviado correctamente
                         alert("Correo enviado correctamente.");
                     } else {
@@ -141,10 +206,26 @@
         
             xhr.send();
         }
+        // Función para manejar el evento de cambio en el campo de búsqueda
+        function handleChange(event) {
+            var codigoInput = event.target.value;
+            buscarPDFsSimilares(codigoInput);
+        }
+
+        var codigoInput = document.getElementById("codigoInput");
+        codigoInput.addEventListener("input", handleChange);
+
+
+
+
     </script>
 </body>
 
 </html>
+
+
+
+
 
 
 

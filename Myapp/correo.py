@@ -9,7 +9,7 @@ def enviar_correo_django(request, codigo):
         subject = f"Solicitud de PDF - Código {codigo}"
         message = f"Estimado usuario,\n\nEl código {codigo} no se encuentra en el sistema. Por favor, revise la solicitud."
         from_email = settings.EMAIL_HOST_USER
-        to_email = ["practicante.almacenamiento@prebel.com.co"]
+        to_email = ["daniel.vargas236@pascualbravo.edu.co"]
 
         send_mail(subject, message, from_email, to_email, fail_silently=False)
         return HttpResponse("Correo enviado correctamente", status=200)

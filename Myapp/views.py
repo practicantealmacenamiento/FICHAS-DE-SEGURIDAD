@@ -67,3 +67,16 @@ def buscar(request):
     return JsonResponse(
         {"error": "Método no permitido.", "status": "error"}, status=405
     )
+
+
+def buscar_pdf_similares(request):
+    if request.method == "POST":
+        codigo = request.POST.get("codigo", "")
+        directorio_pdf = r"C:\Users\prac.almacenamiento\OneDrive - Prebel S.A\FDS\FICHAS DE DATOS DE SEGURIDAD"  # Ruta del directorio de PDFs
+        nombres_pdf = []
+        for filename in os.listdir(directorio_pdf):
+            if filename.endswith(".pdf") and codigo.lower() in filename.lower():
+                nombres_pdf.append(filename)
+        # Devolver una respuesta JSON con los nombres de los archivos PDF
+        return JsonResponse({"nombres_pdf": nombres_pdf})
+    return JsonResponse({"error": "Método no permitido"}, status=405)

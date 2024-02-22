@@ -9,6 +9,9 @@ urlpatterns = [
     path(
         "enviar_correo_django/<codigo>/",
         correo.enviar_correo_django,
-        name="enviar_correo_outlook",
+        name="enviar_correo_django",
+    ),
+    path(
+        "buscar_pdf_similares", views.buscar_pdf_similares, name="buscar_pdf_similares"
     ),
 ]
