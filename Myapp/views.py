@@ -6,6 +6,15 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.conf import settings
+from django.http import FileResponse
+
+
+# ENVIO DE CORREOS
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.template.loader import get_template, render_to_string
+from django.utils.html import strip_tags
 
 
 def index(request):
@@ -80,3 +89,23 @@ def buscar_pdf_similares(request):
         # Devolver una respuesta JSON con los nombres de los archivos PDF
         return JsonResponse({"nombres_pdf": nombres_pdf})
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+def enviar_correo_django(request, codigo):
+    try:
+        # codigo = request.GET.get("codigo")
+        subject = f"Solicitud de PDF - Código {codigo}"
+        message = f"""Estimado usuario,\n\nEl código {codigo} no se encuentra en el sistema. Por favor, revise la solicitud."""
+        from_email = settings.EMAIL_HOST_USER
+        # to_email = ["practicante.almacenamiento@prebel.com.co"]
+        send_mail(
+            subject,
+            message,
+            from_email,
+            ["practicante.almacenamiento@prebel.com.co"],
+            fail_silently=False,
+        )
+        return HttpResponse("Correo enviado correctamente", status=200)
+    except Exception as e:
+        print(f"Error al enviar el correo: {str(e)}")
+        return HttpResponse("Error al enviar el correo", status=500)

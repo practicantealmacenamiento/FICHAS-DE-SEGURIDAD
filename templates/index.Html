@@ -92,8 +92,11 @@
         var codigoInput = document.getElementById("codigoInput");
         codigoInput.addEventListener("input", manipularCodigo);
 
+
+
         function buscar() {
             var codigo = document.getElementById("codigoInput").value;
+
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/buscar", true);
         
@@ -116,9 +119,10 @@
             };
             xhr.responseType = 'blob'; // Indicar que la respuesta es un archivo
             xhr.send("codigo=" + codigo);
-            
+
         }
 
+    
         function abrirPDF(pdfBlob, nombreArchivo) {
             var url = URL.createObjectURL(pdfBlob);
         
@@ -131,6 +135,7 @@
                 }, 1000);
             
         }
+
 
         // Función para obtener el valor del token CSRF de las cookies
         function getCookie(name) {
@@ -157,7 +162,6 @@
                 buscar();
             }
         });
-
 
         // Función para llamar a la vista buscar_pdf_similares y actualizar los resultados
         function buscarPDFsSimilares(codigo) {
@@ -186,12 +190,16 @@
             };
             xhr.send("codigo=" + codigo);
         }
-        
+
+
         function enviar_correo_django() {
             var codigo = document.getElementById("codigoInput").value;
+
+            console.log("Enviando...");
+
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "/enviar_correo_django/" + codigo + "/", true);
-        
+            
             xhr.onreadystatechange = function () {
                 if (xhr.readyState ==  4) {
                     if (xhr.status ==  200) {

@@ -96,7 +96,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True  # O False si no se utiliza TLS
 EMAIL_HOST_USER = "practicante.almacenamiento@prebel.com.co"
 EMAIL_HOST_PASSWORD = "Prebel20242+*"
-
+DEFAULT_FROM_EMAIL = "practicante.almacenamiento@prebel.com.co"
 # Configuración adicional para el envío de correos electrónicos en modo de depuración
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

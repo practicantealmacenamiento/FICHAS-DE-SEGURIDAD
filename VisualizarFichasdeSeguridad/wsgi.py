@@ -7,4 +7,4 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "VisualizarFichasdeSeguridad.set
 
 application = Cling(get_wsgi_application())
 
-serve(application, host="0.0.0.0", port=8082)
+serve(application, host="172.24.66.25", port=8082)
