@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Materias Primas</title>
+    <title>Consulta de Fichas de Seguridad</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
@@ -15,7 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <div class="container">
-        <h1>Consulta de Materias Primas</h1>
+        <h1>Consulta de Fichas de Seguridad</h1>
         <div class="search-container">
             <form method="post" action="/buscar" id="consultaForm">
                 {% csrf_token %}

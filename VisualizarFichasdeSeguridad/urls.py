@@ -1,5 +1,7 @@
 from django.urls import path
-from Myapp import views  # Ajusta la importación según la estructura de tu proyecto
+from Myapp import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 # from Myapp import correo
 

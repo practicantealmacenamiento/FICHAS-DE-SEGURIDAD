@@ -4,7 +4,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = "your_secret_key"
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["172.24.66.25"]
 
@@ -48,7 +48,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "VisualizarFichasdeSeguridad.wsgi.application"
 
-# Database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -56,7 +55,6 @@ DATABASES = {
     }
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -72,7 +70,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
 LANGUAGE_CODE = "es"
 
 TIME_ZONE = "UTC"
@@ -83,20 +80,24 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, images)
 STATIC_URL = "/static/"
 
-# Default primary key field type
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Configuración para el envío de correos electrónicos
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.office365.com"
 EMAIL_PORT = 587
-EMAIL_USE_TLS = True  # O False si no se utiliza TLS
+EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "practicante.almacenamiento@prebel.com.co"
 EMAIL_HOST_PASSWORD = "Prebel20242+*"
 DEFAULT_FROM_EMAIL = "practicante.almacenamiento@prebel.com.co"
-# Configuración adicional para el envío de correos electrónicos en modo de depuración
+
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
